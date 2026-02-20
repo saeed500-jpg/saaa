@@ -3,1171 +3,424 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TeamLink — ارتباط تیمی</title>
+  <title>SAAA — گروه فرهنگی ادبی سعی</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
   <style>
-    :root {
-      --bg: #0a0b0f;
-      --surface: #13151c;
-      --surface2: #1c1f2a;
-      --surface3: #252836;
-      --accent: #5b8def;
-      --accent2: #7c5ce9;
-      --green: #2ecc71;
-      --red: #e74c3c;
-      --yellow: #f39c12;
-      --text: #e8eaf2;
-      --text2: #8a8fa8;
-      --border: rgba(255,255,255,0.07);
-      --radius: 16px;
-      --shadow: 0 8px 32px rgba(0,0,0,0.4);
+    :root{--c1:#ff6b6b;--c2:#feca57;--c3:#48dbfb;--c4:#ff9ff3;--c5:#54a0ff;--c6:#5f27cd;--c7:#00d2d3;--c8:#ff9f43;--white:#fff;--dark:#1a1a2e;--dark3:#0f3460;--text2:#6b7280;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Vazirmatn',sans-serif;background:#f0f4ff;color:var(--dark);height:100vh;overflow:hidden;direction:rtl;}
+    #lobby{display:flex;height:100vh;}
+    .lobby-left{width:45%;background:linear-gradient(135deg,var(--dark) 0%,var(--dark3) 100%);position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;}
+    .lobby-left::before{content:'';position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(255,107,107,.3) 0%,transparent 70%);top:-100px;right:-100px;animation:f1 6s ease-in-out infinite;}
+    .lobby-left::after{content:'';position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(84,160,255,.3) 0%,transparent 70%);bottom:-100px;left:-100px;animation:f2 8s ease-in-out infinite;}
+    @keyframes f1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,20px) scale(1.1)}}
+    @keyframes f2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-20px,-30px) scale(1.1)}}
+    .lobby-brand{position:relative;z-index:2;text-align:center;padding:40px;}
+    .brand-orbs{display:flex;gap:12px;justify-content:center;margin-bottom:32px;}
+    .orb{width:20px;height:20px;border-radius:50%;animation:op 2s ease-in-out infinite;}
+    .orb:nth-child(1){background:var(--c1);animation-delay:0s}
+    .orb:nth-child(2){background:var(--c2);animation-delay:.3s}
+    .orb:nth-child(3){background:var(--c3);animation-delay:.6s}
+    .orb:nth-child(4){background:var(--c4);animation-delay:.9s}
+    .orb:nth-child(5){background:var(--c5);animation-delay:1.2s}
+    @keyframes op{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.3);opacity:1}}
+    .brand-name{font-size:72px;font-weight:900;background:linear-gradient(135deg,var(--c1),var(--c2),var(--c3),var(--c4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-2px;line-height:1;margin-bottom:16px;}
+    .brand-tagline{color:rgba(255,255,255,.9);font-size:22px;font-weight:700;margin-bottom:8px;}
+    .brand-sub{color:rgba(255,255,255,.6);font-size:15px;line-height:1.6;}
+    .sh{position:absolute;border-radius:50%;opacity:.12;}
+    .sh1{width:80px;height:80px;background:var(--c1);top:20%;left:10%;animation:f1 5s ease-in-out infinite;}
+    .sh2{width:50px;height:50px;background:var(--c3);top:70%;right:15%;animation:f2 7s ease-in-out infinite;}
+    .sh3{width:120px;height:120px;background:var(--c2);bottom:15%;left:5%;animation:f1 9s ease-in-out infinite;}
+    .lobby-right{flex:1;display:flex;align-items:center;justify-content:center;padding:40px;background:var(--white);position:relative;overflow:hidden;}
+    .lobby-right::before{content:'';position:absolute;width:300px;height:300px;background:radial-gradient(circle,rgba(84,160,255,.07) 0%,transparent 70%);top:-50px;left:-50px;}
+    .lfw{width:100%;max-width:400px;position:relative;z-index:1;}
+    .fw-title{font-size:32px;font-weight:800;color:var(--dark);margin-bottom:8px;}
+    .fw-sub{color:var(--text2);font-size:15px;line-height:1.5;margin-bottom:36px;}
+    .tab-row{display:flex;background:#f0f4ff;border-radius:14px;padding:5px;margin-bottom:28px;}
+    .tab-btn{flex:1;padding:12px;border:none;background:transparent;color:var(--text2);border-radius:10px;cursor:pointer;font-family:'Vazirmatn',sans-serif;font-size:14px;font-weight:600;transition:all .3s;}
+    .tab-btn.active{background:var(--white);color:var(--dark);box-shadow:0 4px 15px rgba(0,0,0,.1);}
+    .ig{margin-bottom:18px;}
+    .ig label{display:block;font-size:13px;font-weight:600;color:var(--dark);margin-bottom:8px;}
+    .iw{position:relative;}
+    .ii{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:18px;}
+    .ig input{width:100%;padding:14px 44px 14px 16px;background:#f8faff;border:2px solid #e8edf8;border-radius:14px;color:var(--dark);font-family:'Vazirmatn',sans-serif;font-size:15px;outline:none;transition:all .3s;}
+    .ig input:focus{border-color:var(--c5);background:var(--white);box-shadow:0 0 0 4px rgba(84,160,255,.12);}
+    .btn-main{width:100%;padding:16px;border:none;border-radius:14px;font-family:'Vazirmatn',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .3s;margin-top:8px;background:linear-gradient(135deg,var(--dark) 0%,var(--dark3) 100%);color:white;}
+    .btn-main:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(15,52,96,.35);}
+    .err{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);color:var(--c1);padding:12px 16px;border-radius:12px;font-size:13px;margin-top:12px;display:none;}
+    #meeting{display:none;height:100vh;flex-direction:column;background:#0d0f14;}
+    .hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.06);gap:16px;flex-shrink:0;}
+    .hdr-logo{font-size:20px;font-weight:900;background:linear-gradient(135deg,var(--c1),var(--c2),var(--c3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .hdr-c{display:flex;align-items:center;gap:12px;}
+    .room-badge{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);padding:7px 16px;border-radius:30px;font-size:13px;color:rgba(255,255,255,.7);cursor:pointer;transition:all .2s;}
+    .room-badge:hover{border-color:var(--c3);color:var(--c3);}
+    .ldot{display:flex;align-items:center;gap:6px;background:rgba(84,255,150,.12);border:1px solid rgba(84,255,150,.25);padding:6px 14px;border-radius:30px;font-size:12px;color:#54ff96;font-weight:600;}
+    .ldot::before{content:'';width:7px;height:7px;border-radius:50%;background:#54ff96;animation:lp 1.5s ease-in-out infinite;}
+    @keyframes lp{0%,100%{box-shadow:0 0 0 0 rgba(84,255,150,.4)}50%{box-shadow:0 0 0 6px rgba(84,255,150,0)}}
+    .lv-btn{padding:8px 20px;border:1px solid rgba(255,107,107,.3);border-radius:30px;background:rgba(255,107,107,.1);color:var(--c1);font-family:'Vazirmatn',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+    .lv-btn:hover{background:rgba(255,107,107,.2);}
+    .ml{display:flex;flex:1;overflow:hidden;}
+    .va{flex:1;display:flex;flex-direction:column;background:#0a0c10;overflow:hidden;}
+    .vg{flex:1;display:grid;gap:8px;padding:8px;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);}
+    .vs{background:#12151d;border-radius:18px;position:relative;overflow:hidden;border:2px solid transparent;transition:all .3s;}
+    .vs.speaking{border-color:#54ff96;box-shadow:0 0 20px rgba(84,255,150,.3);}
+    .vs video{width:100%;height:100%;object-fit:cover;display:block;}
+    .ulbl{position:absolute;bottom:12px;right:14px;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);padding:5px 14px;border-radius:30px;font-size:12px;font-weight:600;color:white;border:1px solid rgba(255,255,255,.1);}
+    .ap{display:flex;align-items:center;justify-content:center;height:100%;background:linear-gradient(135deg,#12151d,#1a1f2e);}
+    .ac{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:white;}
+    .ac0{background:linear-gradient(135deg,var(--c1),var(--c8));}
+    .ac1{background:linear-gradient(135deg,var(--c5),var(--c6));}
+    .ac2{background:linear-gradient(135deg,var(--c3),var(--c7));}
+    .ac3{background:linear-gradient(135deg,var(--c4),var(--c1));}
+    .es{display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:12px;}
+    .er{width:60px;height:60px;border-radius:50%;border:2px dashed rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:24px;animation:sp 10s linear infinite;}
+    @keyframes sp{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+    .et{color:rgba(255,255,255,.2);font-size:12px;}
+    .ctrls{display:flex;align-items:center;justify-content:center;padding:14px;gap:10px;background:rgba(255,255,255,.03);border-top:1px solid rgba(255,255,255,.05);flex-shrink:0;}
+    .ci{display:flex;flex-direction:column;align-items:center;gap:4px;}
+    .cb{width:52px;height:52px;border-radius:16px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06);color:rgba(255,255,255,.8);font-size:20px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;}
+    .cb:hover{background:rgba(255,255,255,.12);transform:translateY(-2px);}
+    .cb.active{background:rgba(84,160,255,.2);border-color:rgba(84,160,255,.4);color:var(--c5);}
+    .cb.off{background:rgba(255,107,107,.15);border-color:rgba(255,107,107,.3);color:var(--c1);}
+    .cb.danger{background:linear-gradient(135deg,var(--c1),#c0392b);border:none;color:white;box-shadow:0 4px 15px rgba(255,107,107,.4);}
+    .cb.danger:hover{transform:translateY(-2px) scale(1.05);}
+    .cl{font-size:10px;color:rgba(255,255,255,.3);font-weight:500;}
+    .sb{width:300px;background:#0f1117;border-right:1px solid rgba(255,255,255,.05);display:flex;flex-direction:column;flex-shrink:0;}
+    .sbt{display:flex;padding:10px;gap:4px;border-bottom:1px solid rgba(255,255,255,.05);}
+    .stab{flex:1;padding:10px 6px;border:none;background:transparent;color:rgba(255,255,255,.3);font-family:'Vazirmatn',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-radius:10px;transition:all .2s;}
+    .stab.active{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9);}
+    .sp{display:none;flex-direction:column;flex:1;overflow:hidden;}
+    .sp.active{display:flex;}
+    .cm{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+    .cm::-webkit-scrollbar{width:3px;}
+    .cm::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
+    .mb{max-width:100%;animation:mi .25s cubic-bezier(.4,0,.2,1);}
+    @keyframes mi{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+    .mb.mine{align-self:flex-start;}
+    .mb.others{align-self:flex-end;}
+    .ms{font-size:11px;color:rgba(255,255,255,.35);margin-bottom:4px;padding:0 4px;}
+    .mt{padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.6;word-break:break-word;}
+    .mb.mine .mt{background:linear-gradient(135deg,rgba(84,160,255,.2),rgba(95,39,205,.2));border:1px solid rgba(84,160,255,.2);border-radius:14px 14px 4px 14px;color:rgba(255,255,255,.9);}
+    .mb.others .mt{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:14px 14px 14px 4px;color:rgba(255,255,255,.8);}
+    .mtime{font-size:10px;color:rgba(255,255,255,.2);margin-top:3px;padding:0 4px;}
+    .cir{padding:12px;border-top:1px solid rgba(255,255,255,.05);display:flex;gap:8px;align-items:flex-end;}
+    .ci2{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px 14px;color:rgba(255,255,255,.9);font-family:'Vazirmatn',sans-serif;font-size:13px;outline:none;resize:none;min-height:42px;max-height:100px;transition:all .2s;}
+    .ci2:focus{border-color:rgba(84,160,255,.4);background:rgba(255,255,255,.07);}
+    .ci2::placeholder{color:rgba(255,255,255,.2);}
+    .sb2{width:42px;height:42px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--c5),var(--c6));color:white;font-size:16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .sb2:hover{transform:scale(1.08);box-shadow:0 4px 15px rgba(84,160,255,.4);}
+    .fp{overflow-y:auto;padding:12px;flex:1;display:flex;flex-direction:column;gap:8px;}
+    .uz{border:2px dashed rgba(255,255,255,.1);border-radius:14px;padding:24px 16px;text-align:center;cursor:pointer;transition:all .3s;color:rgba(255,255,255,.3);font-size:13px;margin:12px;background:rgba(255,255,255,.02);}
+    .uz:hover,.uz.drag{border-color:var(--c5);color:var(--c5);background:rgba(84,160,255,.06);}
+    .ui{font-size:32px;margin-bottom:8px;display:block;}
+    #fi{display:none;}
+    .fitm{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:12px;display:flex;align-items:center;gap:10px;animation:mi .25s ease;}
+    .fico{font-size:28px;flex-shrink:0;}
+    .fin{flex:1;overflow:hidden;}
+    .fna{font-size:12px;font-weight:600;color:rgba(255,255,255,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .fme{font-size:11px;color:rgba(255,255,255,.3);margin-top:2px;}
+    .fd{width:32px;height:32px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:rgba(255,255,255,.6);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:all .2s;}
+    .fd:hover{background:rgba(84,160,255,.2);border-color:var(--c5);color:var(--c5);}
+    .pl{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;}
+    .pi{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);}
+    .pa{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0;color:white;}
+    .pn{font-size:14px;color:rgba(255,255,255,.85);font-weight:500;}
+    .py{font-size:11px;color:var(--c5);margin-top:2px;}
+    .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:rgba(15,17,23,.95);border:1px solid rgba(255,255,255,.1);padding:12px 22px;border-radius:30px;font-size:13px;z-index:9999;transition:transform .4s cubic-bezier(.4,0,.2,1);box-shadow:0 10px 40px rgba(0,0,0,.5);color:rgba(255,255,255,.9);font-weight:500;white-space:nowrap;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+    .msb{display:none;width:42px;height:42px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:rgba(255,255,255,.8);font-size:18px;cursor:pointer;align-items:center;justify-content:center;}
+    @media(max-width:900px){.lobby-left{display:none;}}
+    @media(max-width:768px){
+      .sb{display:none;position:fixed;left:0;top:0;height:100vh;width:85%;max-width:320px;z-index:200;}
+      .sb.mob{display:flex;}
+      .msb{display:flex;}
+      .mov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:199;backdrop-filter:blur(4px);}
+      .mov.on{display:block;}
+      .cb{width:46px;height:46px;font-size:18px;border-radius:14px;}
+      .cl{display:none;}
+      .ctrls{gap:8px;padding:12px;}
+      .hdr{padding:8px 12px;}
+      .hdr-logo{font-size:18px;}
+      .vg{gap:5px;padding:5px;}
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Vazirmatn', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      height: 100vh;
-      overflow: hidden;
-      direction: rtl;
-    }
-
-    /* ─── LOBBY ─── */
-    #lobby {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background: radial-gradient(ellipse at 60% 40%, #1a1f3a 0%, var(--bg) 70%);
-    }
-
-    .lobby-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 48px;
-      width: 440px;
-      box-shadow: var(--shadow), 0 0 80px rgba(91,141,239,0.08);
-    }
-
-    .logo {
-      font-size: 28px;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
-    }
-
-    .logo-sub {
-      color: var(--text2);
-      font-size: 14px;
-      margin-bottom: 36px;
-    }
-
-    .tab-row {
-      display: flex;
-      gap: 4px;
-      background: var(--surface2);
-      border-radius: 12px;
-      padding: 4px;
-      margin-bottom: 28px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      background: transparent;
-      color: var(--text2);
-      border-radius: 9px;
-      cursor: pointer;
-      font-family: 'Vazirmatn', sans-serif;
-      font-size: 14px;
-      transition: all 0.2s;
-    }
-
-    .tab-btn.active {
-      background: var(--surface3);
-      color: var(--text);
-      font-weight: 600;
-    }
-
-    .input-group { margin-bottom: 16px; }
-
-    .input-group label {
-      display: block;
-      font-size: 13px;
-      color: var(--text2);
-      margin-bottom: 8px;
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 12px 16px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--text);
-      font-family: 'Vazirmatn', sans-serif;
-      font-size: 15px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .input-group input:focus { border-color: var(--accent); }
-
-    .btn {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 12px;
-      font-family: 'Vazirmatn', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-top: 8px;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: white;
-    }
-
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(91,141,239,0.35); }
-
-    .btn-secondary {
-      background: var(--surface2);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    .btn-secondary:hover { background: var(--surface3); }
-
-    .error-msg {
-      background: rgba(231,76,60,0.15);
-      border: 1px solid rgba(231,76,60,0.3);
-      color: #ff6b6b;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 13px;
-      margin-top: 12px;
-      display: none;
-    }
-
-    /* ─── MEETING ROOM ─── */
-    #meeting {
-      display: none;
-      height: 100vh;
-      flex-direction: column;
-    }
-
-    /* Header */
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 20px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      gap: 16px;
-      flex-shrink: 0;
-    }
-
-    .header-logo { font-size: 18px; font-weight: 700; color: var(--accent); }
-
-    .room-badge {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 13px;
-      color: var(--text2);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .room-badge:hover { border-color: var(--accent); color: var(--accent); }
-
-    .participants-count {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: var(--text2);
-    }
-
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-
-    /* Main layout */
-    .main-layout {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    /* Video Grid */
-    .video-area {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background: #070809;
-      overflow: hidden;
-    }
-
-    .video-grid {
-      flex: 1;
-      display: grid;
-      gap: 6px;
-      padding: 6px;
-      grid-template-columns: repeat(2, 1fr);
-      grid-template-rows: repeat(2, 1fr);
-    }
-
-    .video-slot {
-      background: var(--surface);
-      border-radius: 14px;
-      position: relative;
-      overflow: hidden;
-      border: 2px solid transparent;
-      transition: border-color 0.3s;
-    }
-
-    .video-slot.speaking { border-color: var(--green); }
-
-    .video-slot video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .video-slot .user-label {
-      position: absolute;
-      bottom: 10px;
-      right: 12px;
-      background: rgba(0,0,0,0.65);
-      backdrop-filter: blur(8px);
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .video-slot .avatar-placeholder {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      background: var(--surface2);
-    }
-
-    .avatar-circle {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      font-weight: 700;
-      color: white;
-    }
-
-    .video-slot .empty-slot {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      color: var(--text2);
-      font-size: 13px;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .empty-icon { font-size: 32px; opacity: 0.3; }
-
-    /* Controls Bar */
-    .controls {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      gap: 12px;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-
-    .ctrl-btn {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      border: none;
-      background: var(--surface2);
-      color: var(--text);
-      font-size: 20px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    .ctrl-btn:hover { background: var(--surface3); transform: scale(1.05); }
-    .ctrl-btn.active { background: rgba(91,141,239,0.2); color: var(--accent); }
-    .ctrl-btn.danger { background: var(--red); color: white; }
-    .ctrl-btn.danger:hover { background: #c0392b; }
-    .ctrl-btn.off { background: rgba(231,76,60,0.2); color: var(--red); }
-
-    .ctrl-label {
-      font-size: 11px;
-      color: var(--text2);
-      text-align: center;
-      margin-top: 4px;
-    }
-
-    .ctrl-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-
-    /* Sidebar */
-    .sidebar {
-      width: 320px;
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-    }
-
-    .sidebar-tabs {
-      display: flex;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .sidebar-tab {
-      flex: 1;
-      padding: 14px 8px;
-      border: none;
-      background: transparent;
-      color: var(--text2);
-      font-family: 'Vazirmatn', sans-serif;
-      font-size: 13px;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: all 0.2s;
-    }
-
-    .sidebar-tab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
-
-    .sidebar-panel {
-      display: none;
-      flex-direction: column;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    .sidebar-panel.active { display: flex; }
-
-    /* Chat */
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .chat-messages::-webkit-scrollbar { width: 4px; }
-    .chat-messages::-webkit-scrollbar-track { background: transparent; }
-    .chat-messages::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
-
-    .msg-bubble {
-      max-width: 100%;
-      animation: slideIn 0.2s ease;
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .msg-bubble.mine { align-self: flex-start; }
-    .msg-bubble.others { align-self: flex-end; }
-
-    .msg-sender {
-      font-size: 11px;
-      color: var(--text2);
-      margin-bottom: 4px;
-      padding: 0 4px;
-    }
-
-    .msg-text {
-      padding: 10px 14px;
-      border-radius: 14px;
-      font-size: 14px;
-      line-height: 1.5;
-      word-break: break-word;
-    }
-
-    .msg-bubble.mine .msg-text {
-      background: linear-gradient(135deg, rgba(91,141,239,0.25), rgba(124,92,233,0.25));
-      border: 1px solid rgba(91,141,239,0.3);
-      border-radius: 14px 14px 4px 14px;
-    }
-
-    .msg-bubble.others .msg-text {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 14px 14px 14px 4px;
-    }
-
-    .msg-time {
-      font-size: 10px;
-      color: var(--text2);
-      margin-top: 3px;
-      padding: 0 4px;
-    }
-
-    .chat-input-row {
-      padding: 12px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      gap: 8px;
-    }
-
-    .chat-input {
-      flex: 1;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 14px;
-      color: var(--text);
-      font-family: 'Vazirmatn', sans-serif;
-      font-size: 14px;
-      outline: none;
-      resize: none;
-    }
-
-    .chat-input:focus { border-color: var(--accent); }
-
-    .send-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
-      border: none;
-      background: var(--accent);
-      color: white;
-      font-size: 18px;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .send-btn:hover { background: var(--accent2); }
-
-    /* Files Panel */
-    .files-panel { overflow-y: auto; padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
-
-    .file-item {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      animation: slideIn 0.2s ease;
-    }
-
-    .file-icon { font-size: 28px; flex-shrink: 0; }
-
-    .file-info { flex: 1; overflow: hidden; }
-    .file-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .file-meta { font-size: 11px; color: var(--text2); margin-top: 2px; }
-
-    .file-download {
-      width: 34px;
-      height: 34px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--surface3);
-      color: var(--text);
-      font-size: 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-
-    .file-download:hover { background: var(--accent); border-color: var(--accent); }
-
-    .upload-zone {
-      border: 2px dashed var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      color: var(--text2);
-      font-size: 13px;
-      margin: 12px;
-    }
-
-    .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); color: var(--accent); background: rgba(91,141,239,0.05); }
-
-    .upload-icon { font-size: 28px; margin-bottom: 6px; }
-
-    #fileInput { display: none; }
-
-    /* Toast */
-    .toast {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-80px);
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      padding: 12px 20px;
-      border-radius: 12px;
-      font-size: 13px;
-      z-index: 9999;
-      transition: transform 0.3s ease;
-      box-shadow: var(--shadow);
-    }
-
-    .toast.show { transform: translateX(-50%) translateY(0); }
-
-    /* Participants list */
-    .participants-list { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
-
-    .participant-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      background: var(--surface2);
-    }
-
-    .p-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 15px; font-weight: 700; flex-shrink: 0;
-    }
-
-    .p-name { font-size: 14px; }
-    .p-you { font-size: 11px; color: var(--accent); }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .sidebar { display: none; }
-      .sidebar.mobile-open { display: flex; position: fixed; right: 0; top: 0; height: 100vh; z-index: 100; }
-    }
+    @media(max-width:480px){.lobby-right{padding:20px 16px;}.fw-title{font-size:26px;}}
   </style>
 </head>
 <body>
 
-<!-- ─── LOBBY ─── -->
 <div id="lobby">
-  <div class="lobby-card">
-    <div class="logo">🔗 TeamLink</div>
-    <div class="logo-sub">ارتباط تیمی ساده و سریع — تا ۴ نفر</div>
-
-    <div class="tab-row">
-      <button class="tab-btn active" onclick="switchTab('create')">ایجاد اتاق</button>
-      <button class="tab-btn" onclick="switchTab('join')">ورود به اتاق</button>
+  <div class="lobby-left">
+    <div class="sh sh1"></div>
+    <div class="sh sh2"></div>
+    <div class="sh sh3"></div>
+    <div class="lobby-brand">
+      <div class="brand-orbs">
+        <div class="orb"></div><div class="orb"></div><div class="orb"></div><div class="orb"></div><div class="orb"></div>
+      </div>
+      <div class="brand-name">SAAA</div>
+      <div class="brand-tagline">گروه فرهنگی ادبی سعی</div>
+      <div class="brand-sub">فضای دیجیتال اختصاصی گروه ما<br>ارتباط، گفتگو و همکاری</div>
     </div>
-
-    <div class="input-group">
-      <label>نام شما</label>
-      <input type="text" id="userName" placeholder="مثال: علی رضایی" />
+  </div>
+  <div class="lobby-right">
+    <div class="lfw">
+      <div class="fw-title">خوش آمدید 👋</div>
+      <div class="fw-sub">به فضای اختصاصی گروه فرهنگی ادبی سعی وارد شوید</div>
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="switchTab('create')">🚀 اتاق جدید</button>
+        <button class="tab-btn" onclick="switchTab('join')">🔑 ورود به اتاق</button>
+      </div>
+      <div class="ig">
+        <label>نام شما</label>
+        <div class="iw"><span class="ii">👤</span><input type="text" id="userName" placeholder="مثال: علی رضایی" /></div>
+      </div>
+      <div id="join-field" class="ig" style="display:none">
+        <label>کد اتاق</label>
+        <div class="iw"><span class="ii">🔐</span><input type="text" id="roomCodeInput" placeholder="کد ۸ رقمی اتاق" maxlength="8" style="text-transform:uppercase;letter-spacing:4px;" /></div>
+      </div>
+      <button class="btn-main" onclick="handleLobbyBtn()" id="lobbyBtn">🚀 ایجاد اتاق جدید</button>
+      <div class="err" id="errorMsg"></div>
     </div>
-
-    <div id="join-field" class="input-group" style="display:none">
-      <label>کد اتاق</label>
-      <input type="text" id="roomCodeInput" placeholder="مثال: A1B2C3D4" maxlength="8" style="text-transform:uppercase; letter-spacing: 4px;" />
-    </div>
-
-    <button class="btn btn-primary" onclick="handleLobbyBtn()" id="lobbyBtn">🚀 ایجاد اتاق جدید</button>
-
-    <div class="error-msg" id="errorMsg"></div>
   </div>
 </div>
 
-<!-- ─── MEETING ROOM ─── -->
 <div id="meeting">
-  <div class="header">
-    <div class="header-logo">🔗 TeamLink</div>
-    <div style="display:flex; align-items:center; gap:10px;">
-      <div class="participants-count">
-        <div class="dot"></div>
-        <span id="headerCount">۱ نفر</span>
-      </div>
-      <div class="room-badge" onclick="copyRoomCode()" title="کلیک برای کپی">
-        📋 اتاق: <span id="headerRoomId"></span>
-      </div>
+  <div class="hdr">
+    <div class="hdr-logo">SAAA</div>
+    <div class="hdr-c">
+      <div class="ldot" id="headerCount">۱ نفر</div>
+      <div class="room-badge" onclick="copyRoomCode()">📋 <span id="headerRoomId"></span></div>
     </div>
-    <button class="btn btn-secondary" onclick="leaveRoom()" style="width:auto; padding: 8px 16px; margin:0;">خروج</button>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="msb" onclick="toggleMob()">💬</button>
+      <button class="lv-btn" onclick="leaveRoom()">📵 خروج</button>
+    </div>
   </div>
-
-  <div class="main-layout">
-    <!-- Video Grid -->
-    <div class="video-area">
-      <div class="video-grid" id="videoGrid">
-        <div class="video-slot" id="slot-local">
-          <div class="avatar-placeholder" id="localAvatar">
-            <div class="avatar-circle" id="localAvatarLetter">?</div>
-          </div>
+  <div class="ml">
+    <div class="va">
+      <div class="vg" id="videoGrid">
+        <div class="vs" id="slot-local">
+          <div class="ap" id="localAvatar"><div class="ac ac0" id="localAvatarLetter">?</div></div>
           <video id="localVideo" autoplay muted playsinline style="display:none"></video>
-          <div class="user-label" id="localLabel">شما</div>
+          <div class="ulbl" id="localLabel">شما</div>
         </div>
-        <div class="video-slot" id="slot-2"><div class="empty-slot"><div class="empty-icon">👤</div><span>منتظر عضو...</span></div></div>
-        <div class="video-slot" id="slot-3"><div class="empty-slot"><div class="empty-icon">👤</div><span>منتظر عضو...</span></div></div>
-        <div class="video-slot" id="slot-4"><div class="empty-slot"><div class="empty-icon">👤</div><span>منتظر عضو...</span></div></div>
+        <div class="vs" id="slot-2"><div class="es"><div class="er">👤</div><div class="et">منتظر عضو...</div></div></div>
+        <div class="vs" id="slot-3"><div class="es"><div class="er">👤</div><div class="et">منتظر عضو...</div></div></div>
+        <div class="vs" id="slot-4"><div class="es"><div class="er">👤</div><div class="et">منتظر عضو...</div></div></div>
       </div>
-
-      <!-- Controls -->
-      <div class="controls">
-        <div class="ctrl-item">
-          <button class="ctrl-btn" id="btnMic" onclick="toggleMic()" title="میکروفون">🎤</button>
-          <div class="ctrl-label">میکروفون</div>
-        </div>
-        <div class="ctrl-item">
-          <button class="ctrl-btn" id="btnCam" onclick="toggleCam()" title="دوربین">📷</button>
-          <div class="ctrl-label">دوربین</div>
-        </div>
-        <div class="ctrl-item">
-          <button class="ctrl-btn" id="btnScreen" onclick="toggleScreen()" title="اشتراک صفحه">🖥️</button>
-          <div class="ctrl-label">صفحه</div>
-        </div>
-        <div class="ctrl-item">
-          <button class="ctrl-btn danger" onclick="leaveRoom()">📵</button>
-          <div class="ctrl-label">قطع</div>
-        </div>
+      <div class="ctrls">
+        <div class="ci"><button class="cb" id="btnMic" onclick="toggleMic()">🎤</button><div class="cl">میکروفون</div></div>
+        <div class="ci"><button class="cb" id="btnCam" onclick="toggleCam()">📷</button><div class="cl">دوربین</div></div>
+        <div class="ci"><button class="cb" id="btnScreen" onclick="toggleScreen()">🖥️</button><div class="cl">صفحه</div></div>
+        <div class="ci"><button class="cb danger" onclick="leaveRoom()">📵</button><div class="cl">قطع</div></div>
       </div>
     </div>
-
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <div class="sidebar-tabs">
-        <button class="sidebar-tab active" onclick="switchSideTab('chat', this)">💬 چت</button>
-        <button class="sidebar-tab" onclick="switchSideTab('files', this)">📁 فایل</button>
-        <button class="sidebar-tab" onclick="switchSideTab('people', this)">👥 اعضا</button>
+    <div class="sb" id="sidebar">
+      <div class="sbt">
+        <button class="stab active" onclick="switchST('chat',this)">💬 چت</button>
+        <button class="stab" onclick="switchST('files',this)">📁 فایل</button>
+        <button class="stab" onclick="switchST('people',this)">👥 اعضا</button>
       </div>
-
-      <!-- Chat -->
-      <div class="sidebar-panel active" id="panel-chat">
-        <div class="chat-messages" id="chatMessages">
-          <div class="msg-bubble others">
-            <div class="msg-text">👋 به TeamLink خوش آمدید! می‌توانید پیام بفرستید.</div>
-          </div>
+      <div class="sp active" id="panel-chat">
+        <div class="cm" id="chatMessages">
+          <div class="mb others"><div class="mt">👋 به فضای گروه فرهنگی ادبی سعی خوش آمدید!</div></div>
         </div>
-        <div class="chat-input-row">
-          <textarea class="chat-input" id="chatInput" placeholder="پیام بنویسید..." rows="1"
+        <div class="cir">
+          <textarea class="ci2" id="chatInput" placeholder="پیام بنویسید..." rows="1"
             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
-          <button class="send-btn" onclick="sendChat()">➤</button>
+          <button class="sb2" onclick="sendChat()">➤</button>
         </div>
       </div>
-
-      <!-- Files -->
-      <div class="sidebar-panel" id="panel-files">
-        <div class="upload-zone" onclick="document.getElementById('fileInput').click()"
+      <div class="sp" id="panel-files">
+        <div class="uz" onclick="document.getElementById('fi').click()"
           ondragover="event.preventDefault();this.classList.add('drag')"
           ondragleave="this.classList.remove('drag')"
           ondrop="handleDrop(event)">
-          <div class="upload-icon">📤</div>
-          <div>فایل را اینجا بکشید یا کلیک کنید</div>
-          <div style="font-size:11px; margin-top:4px; opacity:0.6;">حداکثر ۵۰ مگابایت</div>
+          <span class="ui">📤</span>
+          <div>فایل را بکشید یا کلیک کنید</div>
+          <div style="font-size:11px;margin-top:4px;opacity:.5;">حداکثر ۵۰ مگابایت</div>
         </div>
-        <input type="file" id="fileInput" onchange="uploadFile(this.files[0])">
-        <div class="files-panel" id="filesList"></div>
+        <input type="file" id="fi" onchange="uploadFile(this.files[0])">
+        <div class="fp" id="filesList"></div>
       </div>
-
-      <!-- People -->
-      <div class="sidebar-panel" id="panel-people">
-        <div class="participants-list" id="participantsList"></div>
+      <div class="sp" id="panel-people">
+        <div class="pl" id="participantsList"></div>
       </div>
     </div>
   </div>
 </div>
 
+<div class="mov" id="mobileOverlay" onclick="toggleMob()"></div>
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── STATE ───
-const SERVER_URL = window.location.origin;
-let socket, myName, myRoomId, myId;
-let localStream = null;
-let screenStream = null;
-let peers = {}; // socketId -> RTCPeerConnection
-let remoteUsers = {}; // socketId -> {name, videoEl, slot}
-let micOn = true, camOn = true, screenOn = false;
-let lobbyMode = 'create';
-let freeSlots = [2, 3, 4];
+const SU=window.location.origin;
+let socket,myName,myRoomId,myId,localStream=null,screenStream=null;
+let peers={},remoteUsers={},micOn=true,camOn=true,screenOn=false;
+let lobbyMode='create',freeSlots=[2,3,4],avIdx=0;
+const ice={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]};
 
-const iceConfig = {
-  iceServers: [
-    { urls: 'stun:stun.l.google.com:19302' },
-    { urls: 'stun:stun1.l.google.com:19302' }
-  ]
-};
-
-// ─── LOBBY ───
-function switchTab(mode) {
-  lobbyMode = mode;
-  document.querySelectorAll('.tab-btn').forEach((b, i) => {
-    b.classList.toggle('active', (i === 0 && mode === 'create') || (i === 1 && mode === 'join'));
-  });
-  document.getElementById('join-field').style.display = mode === 'join' ? 'block' : 'none';
-  document.getElementById('lobbyBtn').textContent = mode === 'create' ? '🚀 ایجاد اتاق جدید' : '🔑 ورود به اتاق';
+function switchTab(m){
+  lobbyMode=m;
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&m==='create')||(i===1&&m==='join')));
+  document.getElementById('join-field').style.display=m==='join'?'block':'none';
+  document.getElementById('lobbyBtn').textContent=m==='create'?'🚀 ایجاد اتاق جدید':'🔑 ورود به اتاق';
 }
 
-async function handleLobbyBtn() {
-  const name = document.getElementById('userName').value.trim();
-  if (!name) return showError('لطفاً نام خود را وارد کنید');
-
-  if (lobbyMode === 'create') {
-    const res = await fetch(`${SERVER_URL}/create-room`, { method: 'POST' });
-    const { roomId } = await res.json();
-    enterMeeting(roomId, name);
-  } else {
-    const code = document.getElementById('roomCodeInput').value.trim().toUpperCase();
-    if (code.length < 8) return showError('کد اتاق باید ۸ کاراکتر باشد');
-    enterMeeting(code, name);
+async function handleLobbyBtn(){
+  const n=document.getElementById('userName').value.trim();
+  if(!n) return showErr('لطفاً نام خود را وارد کنید');
+  if(lobbyMode==='create'){
+    const r=await fetch(`${SU}/create-room`,{method:'POST'});
+    const{roomId}=await r.json();
+    enter(roomId,n);
+  }else{
+    const c=document.getElementById('roomCodeInput').value.trim().toUpperCase();
+    if(c.length<8) return showErr('کد اتاق باید ۸ کاراکتر باشد');
+    enter(c,n);
   }
 }
 
-function showError(msg) {
-  const el = document.getElementById('errorMsg');
-  el.textContent = msg;
-  el.style.display = 'block';
-  setTimeout(() => el.style.display = 'none', 3000);
-}
+function showErr(m){const e=document.getElementById('errorMsg');e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',3000);}
 
-// ─── ENTER MEETING ───
-async function enterMeeting(roomId, name) {
-  myRoomId = roomId;
-  myName = name;
-
-  document.getElementById('lobby').style.display = 'none';
-  document.getElementById('meeting').style.display = 'flex';
-  document.getElementById('headerRoomId').textContent = roomId;
-  document.getElementById('localLabel').textContent = name + ' (شما)';
-  document.getElementById('localAvatarLetter').textContent = name.charAt(0);
-
-  // Get media
-  try {
-    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    const localVideo = document.getElementById('localVideo');
-    localVideo.srcObject = localStream;
-    localVideo.style.display = 'block';
-    document.getElementById('localAvatar').style.display = 'none';
-  } catch (e) {
-    console.warn('Media access denied:', e);
-    showToast('⚠️ دسترسی به دوربین/میکروفون رد شد');
-  }
-
-  // Connect socket
-  socket = io(SERVER_URL);
-  setupSocket();
-  socket.emit('join-room', { roomId, userName: name });
-
-  updateParticipantsList();
-}
-
-// ─── SOCKET SETUP ───
-function setupSocket() {
-  socket.on('room-joined', ({ users, yourId }) => {
-    myId = yourId;
-    users.forEach(user => {
-      createPeer(user.socketId, user.name, true); // We initiate
-    });
-  });
-
-  socket.on('user-joined', (user) => {
-    showToast(`👋 ${user.name} وارد شد`);
-    createPeer(user.socketId, user.name, false); // They will initiate
-    updateParticipantsList();
-  });
-
-  socket.on('user-left', ({ socketId, name }) => {
-    showToast(`👋 ${name} خارج شد`);
-    removePeer(socketId);
-    updateParticipantsList();
-  });
-
-  socket.on('offer', async ({ fromId, fromName, offer }) => {
-    if (!peers[fromId]) createPeer(fromId, fromName, false);
-    const pc = peers[fromId].pc;
+async function enter(roomId,name){
+  myRoomId=roomId;myName=name;
+  document.getElementById('lobby').style.display='none';
+  document.getElementById('meeting').style.display='flex';
+  document.getElementById('headerRoomId').textContent=roomId;
+  document.getElementById('localLabel').textContent=name+' (شما)';
+  document.getElementById('localAvatarLetter').textContent=name.charAt(0);
+  try{
+    localStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+    const lv=document.getElementById('localVideo');lv.srcObject=localStream;lv.style.display='block';
+    document.getElementById('localAvatar').style.display='none';
+  }catch(e){showToast('⚠️ دسترسی به دوربین/میکروفون رد شد');}
+  socket=io(SU);
+  socket.on('room-joined',({users,yourId})=>{myId=yourId;users.forEach(u=>mkPeer(u.socketId,u.name,true));});
+  socket.on('user-joined',(u)=>{showToast(`👋 ${u.name} وارد شد`);mkPeer(u.socketId,u.name,false);updPl();});
+  socket.on('user-left',({socketId,name})=>{showToast(`👋 ${name} خارج شد`);rmPeer(socketId);updPl();});
+  socket.on('offer',async({fromId,fromName,offer})=>{
+    if(!peers[fromId]) mkPeer(fromId,fromName,false);
+    const pc=peers[fromId].pc;
     await pc.setRemoteDescription(new RTCSessionDescription(offer));
-    const answer = await pc.createAnswer();
-    await pc.setLocalDescription(answer);
-    socket.emit('answer', { targetId: fromId, answer });
+    const ans=await pc.createAnswer();await pc.setLocalDescription(ans);
+    socket.emit('answer',{targetId:fromId,answer:ans});
   });
-
-  socket.on('answer', async ({ fromId, answer }) => {
-    const peer = peers[fromId];
-    if (peer) await peer.pc.setRemoteDescription(new RTCSessionDescription(answer));
-  });
-
-  socket.on('ice-candidate', async ({ fromId, candidate }) => {
-    const peer = peers[fromId];
-    if (peer && candidate) {
-      try { await peer.pc.addIceCandidate(new RTCIceCandidate(candidate)); } catch(e){}
-    }
-  });
-
-  socket.on('chat-message', (msg) => {
-    addChatMessage(msg);
-  });
-
-  socket.on('file-shared', (file) => {
-    addFileToList(file);
-    showToast(`📎 ${file.sender} یک فایل به اشتراک گذاشت`);
-  });
-
-  socket.on('error', ({ message }) => {
-    showToast('❌ ' + message);
-    document.getElementById('meeting').style.display = 'none';
-    document.getElementById('lobby').style.display = 'flex';
-  });
+  socket.on('answer',async({fromId,answer})=>{const p=peers[fromId];if(p) await p.pc.setRemoteDescription(new RTCSessionDescription(answer));});
+  socket.on('ice-candidate',async({fromId,candidate})=>{const p=peers[fromId];if(p&&candidate){try{await p.pc.addIceCandidate(new RTCIceCandidate(candidate));}catch(e){}}});
+  socket.on('chat-message',(m)=>addMsg(m));
+  socket.on('file-shared',(f)=>{addFile(f);showToast(`📎 ${f.sender} یک فایل به اشتراک گذاشت`);});
+  socket.on('error',({message})=>{showToast('❌ '+message);document.getElementById('meeting').style.display='none';document.getElementById('lobby').style.display='flex';});
+  socket.emit('join-room',{roomId,userName:name});
+  updPl();
 }
 
-// ─── WEBRTC ───
-function createPeer(remoteId, remoteName, initiator) {
-  const pc = new RTCPeerConnection(iceConfig);
-
-  // Add local tracks
-  if (localStream) {
-    localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-  }
-
-  // Handle remote stream
-  pc.ontrack = (e) => {
-    const stream = e.streams[0];
-    if (!remoteUsers[remoteId]) setupRemoteSlot(remoteId, remoteName);
-    const video = remoteUsers[remoteId]?.videoEl;
-    if (video) video.srcObject = stream;
-  };
-
-  pc.onicecandidate = (e) => {
-    if (e.candidate) socket.emit('ice-candidate', { targetId: remoteId, candidate: e.candidate });
-  };
-
-  pc.onconnectionstatechange = () => {
-    if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
-      removePeer(remoteId);
-    }
-  };
-
-  peers[remoteId] = { pc, name: remoteName };
-  setupRemoteSlot(remoteId, remoteName);
-
-  if (initiator) {
-    pc.onnegotiationneeded = async () => {
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-      socket.emit('offer', { targetId: remoteId, offer });
-    };
-  }
-
-  updateParticipantsList();
-  updateCount();
+function mkPeer(rid,rn,init){
+  const pc=new RTCPeerConnection(ice);
+  if(localStream) localStream.getTracks().forEach(t=>pc.addTrack(t,localStream));
+  pc.ontrack=(e)=>{const s=e.streams[0];if(!remoteUsers[rid]) mkSlot(rid,rn);const v=remoteUsers[rid]?.videoEl;if(v) v.srcObject=s;};
+  pc.onicecandidate=(e)=>{if(e.candidate) socket.emit('ice-candidate',{targetId:rid,candidate:e.candidate});};
+  pc.onconnectionstatechange=()=>{if(pc.connectionState==='disconnected'||pc.connectionState==='failed') rmPeer(rid);};
+  peers[rid]={pc,name:rn};mkSlot(rid,rn);
+  if(init){pc.onnegotiationneeded=async()=>{const o=await pc.createOffer();await pc.setLocalDescription(o);socket.emit('offer',{targetId:rid,offer:o});};}
+  updPl();updCnt();
 }
 
-function setupRemoteSlot(remoteId, remoteName) {
-  if (remoteUsers[remoteId]) return;
-
-  const slotNum = freeSlots.shift();
-  if (!slotNum) return;
-
-  const slot = document.getElementById(`slot-${slotNum}`);
-  const letter = remoteName.charAt(0);
-
-  slot.innerHTML = `
-    <div class="avatar-placeholder" id="avatar-${remoteId}">
-      <div class="avatar-circle">${letter}</div>
-    </div>
-    <video id="video-${remoteId}" autoplay playsinline style="display:none; width:100%; height:100%; object-fit:cover;"></video>
-    <div class="user-label">${remoteName}</div>
-  `;
-
-  const videoEl = document.getElementById(`video-${remoteId}`);
-  videoEl.onloadedmetadata = () => {
-    videoEl.style.display = 'block';
-    document.getElementById(`avatar-${remoteId}`).style.display = 'none';
-  };
-
-  remoteUsers[remoteId] = { name: remoteName, videoEl, slotNum };
+function mkSlot(rid,rn){
+  if(remoteUsers[rid]) return;
+  const sn=freeSlots.shift();if(!sn) return;
+  const slot=document.getElementById(`slot-${sn}`);
+  const l=rn.charAt(0);const ci=avIdx++%4;
+  slot.innerHTML=`<div class="ap" id="av-${rid}"><div class="ac ac${ci}">${l}</div></div><video id="v-${rid}" autoplay playsinline style="display:none;width:100%;height:100%;object-fit:cover;"></video><div class="ulbl">${rn}</div>`;
+  const ve=document.getElementById(`v-${rid}`);
+  ve.onloadedmetadata=()=>{ve.style.display='block';const a=document.getElementById(`av-${rid}`);if(a) a.style.display='none';};
+  remoteUsers[rid]={name:rn,videoEl:ve,slotNum:sn};
 }
 
-function removePeer(remoteId) {
-  if (peers[remoteId]) {
-    peers[remoteId].pc.close();
-    delete peers[remoteId];
-  }
-  if (remoteUsers[remoteId]) {
-    const { slotNum } = remoteUsers[remoteId];
-    freeSlots.unshift(slotNum);
-    freeSlots.sort();
-    const slot = document.getElementById(`slot-${slotNum}`);
-    slot.innerHTML = `<div class="empty-slot"><div class="empty-icon">👤</div><span>منتظر عضو...</span></div>`;
-    delete remoteUsers[remoteId];
-  }
-  updateParticipantsList();
-  updateCount();
+function rmPeer(rid){
+  if(peers[rid]){peers[rid].pc.close();delete peers[rid];}
+  if(remoteUsers[rid]){const{slotNum:sn}=remoteUsers[rid];freeSlots.unshift(sn);freeSlots.sort();const slot=document.getElementById(`slot-${sn}`);slot.innerHTML=`<div class="es"><div class="er">👤</div><div class="et">منتظر عضو...</div></div>`;delete remoteUsers[rid];}
+  updPl();updCnt();
 }
 
-// ─── CONTROLS ───
-function toggleMic() {
-  micOn = !micOn;
-  localStream?.getAudioTracks().forEach(t => t.enabled = micOn);
-  const btn = document.getElementById('btnMic');
-  btn.textContent = micOn ? '🎤' : '🔇';
-  btn.classList.toggle('off', !micOn);
+function toggleMic(){micOn=!micOn;localStream?.getAudioTracks().forEach(t=>t.enabled=micOn);const b=document.getElementById('btnMic');b.textContent=micOn?'🎤':'🔇';b.classList.toggle('off',!micOn);}
+function toggleCam(){camOn=!camOn;localStream?.getVideoTracks().forEach(t=>t.enabled=camOn);document.getElementById('btnCam').classList.toggle('off',!camOn);document.getElementById('localVideo').style.display=camOn?'block':'none';document.getElementById('localAvatar').style.display=camOn?'none':'flex';}
+
+async function toggleScreen(){
+  if(!screenOn){
+    try{
+      screenStream=await navigator.mediaDevices.getDisplayMedia({video:true});
+      const st=screenStream.getVideoTracks()[0];
+      Object.values(peers).forEach(({pc})=>{const s=pc.getSenders().find(s=>s.track?.kind==='video');if(s) s.replaceTrack(st);});
+      document.getElementById('localVideo').srcObject=screenStream;document.getElementById('localVideo').style.display='block';document.getElementById('localAvatar').style.display='none';
+      st.onended=()=>stopSc();screenOn=true;document.getElementById('btnScreen').classList.add('active');
+    }catch(e){showToast('❌ اشتراک صفحه لغو شد');}
+  }else{stopSc();}
 }
 
-function toggleCam() {
-  camOn = !camOn;
-  localStream?.getVideoTracks().forEach(t => t.enabled = camOn);
-  const btn = document.getElementById('btnCam');
-  btn.textContent = camOn ? '📷' : '📷';
-  btn.classList.toggle('off', !camOn);
-  document.getElementById('localVideo').style.display = camOn ? 'block' : 'none';
-  document.getElementById('localAvatar').style.display = camOn ? 'none' : 'flex';
+function stopSc(){
+  screenOn=false;document.getElementById('btnScreen').classList.remove('active');screenStream?.getTracks().forEach(t=>t.stop());
+  if(localStream){const ct=localStream.getVideoTracks()[0];Object.values(peers).forEach(({pc})=>{const s=pc.getSenders().find(s=>s.track?.kind==='video');if(s) s.replaceTrack(ct);});document.getElementById('localVideo').srcObject=localStream;}
 }
 
-async function toggleScreen() {
-  if (!screenOn) {
-    try {
-      screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-      const screenTrack = screenStream.getVideoTracks()[0];
-
-      // Replace video track in all peers
-      Object.values(peers).forEach(({ pc }) => {
-        const sender = pc.getSenders().find(s => s.track?.kind === 'video');
-        if (sender) sender.replaceTrack(screenTrack);
-      });
-
-      // Show screen in local video
-      document.getElementById('localVideo').srcObject = screenStream;
-      document.getElementById('localVideo').style.display = 'block';
-      document.getElementById('localAvatar').style.display = 'none';
-
-      screenTrack.onended = () => stopScreen();
-      screenOn = true;
-      document.getElementById('btnScreen').classList.add('active');
-    } catch(e) {
-      showToast('❌ اشتراک صفحه لغو شد');
-    }
-  } else {
-    stopScreen();
-  }
+function leaveRoom(){
+  localStream?.getTracks().forEach(t=>t.stop());screenStream?.getTracks().forEach(t=>t.stop());socket?.disconnect();
+  Object.values(peers).forEach(({pc})=>pc.close());peers={};remoteUsers={};freeSlots=[2,3,4];avIdx=0;
+  document.getElementById('meeting').style.display='none';document.getElementById('lobby').style.display='flex';
+  document.querySelectorAll('.vs:not(#slot-local)').forEach(s=>s.innerHTML=`<div class="es"><div class="er">👤</div><div class="et">منتظر عضو...</div></div>`);
+  document.getElementById('chatMessages').innerHTML='';document.getElementById('filesList').innerHTML='';
 }
 
-function stopScreen() {
-  screenOn = false;
-  document.getElementById('btnScreen').classList.remove('active');
-  screenStream?.getTracks().forEach(t => t.stop());
+function sendChat(){const i=document.getElementById('chatInput');const t=i.value.trim();if(!t) return;socket.emit('chat-message',{roomId:myRoomId,message:t});i.value='';}
 
-  // Restore camera
-  if (localStream) {
-    const camTrack = localStream.getVideoTracks()[0];
-    Object.values(peers).forEach(({ pc }) => {
-      const sender = pc.getSenders().find(s => s.track?.kind === 'video');
-      if (sender) sender.replaceTrack(camTrack);
-    });
-    document.getElementById('localVideo').srcObject = localStream;
-  }
+function addMsg({text,sender,senderId,timestamp}){
+  const iM=senderId===myId;
+  const ti=new Date(timestamp).toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit'});
+  const d=document.createElement('div');d.className=`mb ${iM?'mine':'others'}`;
+  d.innerHTML=`${!iM?`<div class="ms">${sender}</div>`:''}<div class="mt">${esc(text)}</div><div class="mtime">${ti}</div>`;
+  const c=document.getElementById('chatMessages');c.appendChild(d);c.scrollTop=c.scrollHeight;
 }
 
-function leaveRoom() {
-  localStream?.getTracks().forEach(t => t.stop());
-  screenStream?.getTracks().forEach(t => t.stop());
-  socket?.disconnect();
-  Object.values(peers).forEach(({ pc }) => pc.close());
-  peers = {};
-  remoteUsers = {};
-  freeSlots = [2, 3, 4];
-
-  // Reset
-  document.getElementById('meeting').style.display = 'none';
-  document.getElementById('lobby').style.display = 'flex';
-  document.getElementById('videoGrid').querySelectorAll('.video-slot:not(#slot-local)').forEach((s, i) => {
-    s.innerHTML = `<div class="empty-slot"><div class="empty-icon">👤</div><span>منتظر عضو...</span></div>`;
-  });
-  document.getElementById('chatMessages').innerHTML = '';
-  document.getElementById('filesList').innerHTML = '';
-}
-
-// ─── CHAT ───
-function sendChat() {
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
-  if (!text) return;
-  socket.emit('chat-message', { roomId: myRoomId, message: text });
-  input.value = '';
-}
-
-function addChatMessage({ text, sender, senderId, timestamp }) {
-  const isMe = senderId === myId;
-  const time = new Date(timestamp).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
-  const div = document.createElement('div');
-  div.className = `msg-bubble ${isMe ? 'mine' : 'others'}`;
-  div.innerHTML = `
-    ${!isMe ? `<div class="msg-sender">${sender}</div>` : ''}
-    <div class="msg-text">${escapeHtml(text)}</div>
-    <div class="msg-time">${time}</div>
-  `;
-  const container = document.getElementById('chatMessages');
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
-
-  // Badge
-  if (!document.getElementById('panel-chat').classList.contains('active')) {
-    document.querySelector('[onclick*="chat"]').textContent = '💬 چت 🔴';
-  }
-}
-
-// ─── FILES ───
-async function uploadFile(file) {
-  if (!file) return;
-  if (file.size > 50 * 1024 * 1024) return showToast('❌ فایل بیش از ۵۰ مگابایت است');
-
+async function uploadFile(file){
+  if(!file) return;if(file.size>50*1024*1024) return showToast('❌ فایل بیش از ۵۰ مگابایت است');
   showToast('📤 در حال آپلود...');
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('senderName', myName);
-
-  try {
-    const res = await fetch(`${SERVER_URL}/upload/${myRoomId}`, { method: 'POST', body: formData });
-    const data = await res.json();
-    if (!data.success) throw new Error();
-    showToast('✅ فایل به اشتراک گذاشته شد');
-  } catch(e) {
-    showToast('❌ خطا در آپلود فایل');
-  }
-
-  document.getElementById('fileInput').value = '';
+  const fd=new FormData();fd.append('file',file);fd.append('senderName',myName);
+  try{const r=await fetch(`${SU}/upload/${myRoomId}`,{method:'POST',body:fd});const d=await r.json();if(!d.success) throw new Error();showToast('✅ فایل به اشتراک گذاشته شد');}catch(e){showToast('❌ خطا در آپلود فایل');}
+  document.getElementById('fi').value='';
 }
 
-function handleDrop(e) {
-  e.preventDefault();
-  document.querySelector('.upload-zone').classList.remove('drag');
-  const file = e.dataTransfer.files[0];
-  if (file) uploadFile(file);
+function handleDrop(e){e.preventDefault();document.querySelector('.uz').classList.remove('drag');const f=e.dataTransfer.files[0];if(f) uploadFile(f);}
+
+function addFile(file){
+  let ic='📄';const t=file.type;
+  if(t.startsWith('image/')) ic='🖼️';else if(t.startsWith('video/')) ic='🎬';else if(t.startsWith('audio/')) ic='🎵';else if(t.includes('pdf')) ic='📕';else if(t.includes('zip')||t.includes('rar')) ic='🗜️';
+  const sz=file.size<1024?file.size+' B':file.size<1048576?(file.size/1024).toFixed(1)+' KB':(file.size/1048576).toFixed(1)+' MB';
+  const d=document.createElement('div');d.className='fitm';
+  d.innerHTML=`<div class="fico">${ic}</div><div class="fin"><div class="fna">${esc(file.name)}</div><div class="fme">${file.sender} · ${sz}</div></div><a class="fd" href="${file.url}" download="${file.name}">⬇</a>`;
+  document.getElementById('filesList').appendChild(d);
 }
 
-function addFileToList(file) {
-  const icon = getFileIcon(file.type);
-  const size = formatSize(file.size);
-  const div = document.createElement('div');
-  div.className = 'file-item';
-  div.innerHTML = `
-    <div class="file-icon">${icon}</div>
-    <div class="file-info">
-      <div class="file-name">${escapeHtml(file.name)}</div>
-      <div class="file-meta">${file.sender} · ${size}</div>
-    </div>
-    <a class="file-download" href="${file.url}" download="${file.name}" title="دانلود">⬇</a>
-  `;
-  document.getElementById('filesList').appendChild(div);
+function switchST(t,b){
+  document.querySelectorAll('.sp').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.stab').forEach(b=>b.classList.remove('active'));
+  document.getElementById(`panel-${t}`).classList.add('active');b.classList.add('active');
 }
 
-function getFileIcon(type) {
-  if (type.startsWith('image/')) return '🖼️';
-  if (type.startsWith('video/')) return '🎬';
-  if (type.startsWith('audio/')) return '🎵';
-  if (type.includes('pdf')) return '📕';
-  if (type.includes('zip') || type.includes('rar')) return '🗜️';
-  if (type.includes('word') || type.includes('document')) return '📝';
-  if (type.includes('sheet') || type.includes('excel')) return '📊';
-  return '📄';
+function updPl(){
+  const l=document.getElementById('participantsList');
+  const all=[{name:myName,isMe:true}];Object.values(remoteUsers).forEach(u=>all.push({name:u.name,isMe:false}));
+  const cs=['ac0','ac1','ac2','ac3'];
+  l.innerHTML=all.map((u,i)=>`<div class="pi"><div class="pa ${cs[i%4]}">${u.name?.charAt(0)||'?'}</div><div><div class="pn">${esc(u.name||'')}</div>${u.isMe?'<div class="py">شما</div>':''}</div></div>`).join('');
 }
 
-function formatSize(bytes) {
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / 1024 / 1024).toFixed(1) + ' MB';
-}
-
-// ─── SIDEBAR TABS ───
-function switchSideTab(tab, btn) {
-  document.querySelectorAll('.sidebar-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sidebar-tab').forEach(b => b.classList.remove('active'));
-  document.getElementById(`panel-${tab}`).classList.add('active');
-  btn.classList.add('active');
-
-  if (tab === 'chat') btn.textContent = '💬 چت';
-}
-
-// ─── PARTICIPANTS ───
-function updateParticipantsList() {
-  const list = document.getElementById('participantsList');
-  const allUsers = [{ socketId: myId, name: myName, isMe: true }];
-  Object.entries(remoteUsers).forEach(([id, u]) => allUsers.push({ socketId: id, name: u.name, isMe: false }));
-
-  list.innerHTML = allUsers.map(u => `
-    <div class="participant-item">
-      <div class="p-avatar">${u.name?.charAt(0) || '?'}</div>
-      <div>
-        <div class="p-name">${escapeHtml(u.name || '')}</div>
-        ${u.isMe ? '<div class="p-you">شما</div>' : ''}
-      </div>
-    </div>
-  `).join('');
-}
-
-function updateCount() {
-  const count = 1 + Object.keys(remoteUsers).length;
-  document.getElementById('headerCount').textContent = count + ' نفر';
-}
-
-// ─── UTILS ───
-function copyRoomCode() {
-  navigator.clipboard.writeText(myRoomId).then(() => showToast('✅ کد اتاق کپی شد: ' + myRoomId));
-}
-
-function showToast(msg) {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
-}
-
-function escapeHtml(text) {
-  const d = document.createElement('div');
-  d.textContent = text;
-  return d.innerHTML;
-}
-
-// Keyboard shortcut: Enter in lobby
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && document.getElementById('lobby').style.display !== 'none') {
-    handleLobbyBtn();
-  }
-});
+function updCnt(){document.getElementById('headerCount').textContent=(1+Object.keys(remoteUsers).length)+' نفر';}
+function copyRoomCode(){navigator.clipboard.writeText(myRoomId).then(()=>showToast('✅ کد اتاق کپی شد: '+myRoomId));}
+function toggleMob(){document.getElementById('sidebar').classList.toggle('mob');document.getElementById('mobileOverlay').classList.toggle('on');}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function esc(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+document.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&document.getElementById('lobby').style.display!=='none') handleLobbyBtn();});
 </script>
 </body>
 </html>

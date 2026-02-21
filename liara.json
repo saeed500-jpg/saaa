@@ -1,0 +1,7 @@
+{
+  "platform": "node",
+  "node": {
+    "version": 18
+  },
+  "port": 3000
+}
